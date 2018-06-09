@@ -222,7 +222,7 @@
 (def extractRotation
   (let [v (vec3/vec3)]
     (fn [mat]
-      (let [ret (create-identity)
+      (let [ret (ident)
             scaleX (/ 1 (vec3/length (vec3/setFromArray v mat 0)))
             scaleY (/ 1 (vec3/length (vec3/setFromArray v mat 4)))
             scaleZ (/ 1 (vec3/length (vec3/setFromArray v mat 8)))]
