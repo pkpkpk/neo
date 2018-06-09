@@ -1,0 +1,6 @@
+{:paths ["src/main"]
+ :deps {org.clojure/clojurescript {:mvn/version "1.10.238"}}
+ :aliases {:test {:extra-deps {org.clojure/core.async    {:mvn/version "0.4.474"}}
+                  :extra-paths ["src/test"]}
+           :periodic {:extra-deps {org.omcljs/om {:mvn/version "1.0.0-beta3"}}
+                      :extra-paths ["examples/periodic/src"]}}}

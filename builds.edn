@@ -1,0 +1,20 @@
+{"test" {:id "test"
+         :alias ["test"]
+         :source-paths ["src/main" "src/test"]
+         :compiler {:target :nodejs
+                    :main 'neo.runner
+                    :output-to "target/tests.js"
+                    :output-dir "target/out"
+                    :parallel-build true
+                    :aot-cache true ;; this needs to be disabled for type-checking
+                    :npm-deps {:raf "^3.4.0"}
+                    :install-deps true}}
+ "periodic" {:id "periodic"
+             :alias ["periodic"]
+             :source-paths ["src/main" "examples/periodic/src"]
+             :compiler {:main 'periodic.core
+                        :parallel-build true
+                        :aot-cache true
+                        :asset-path "js/compiled/out"
+                        :output-to  "examples/periodic/resources/public/js/compiled/periodic.js"
+                        :output-dir "examples/periodic/resources/public/js/compiled/out"}}}
