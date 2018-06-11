@@ -45,7 +45,7 @@
       (is= 0 (vx a))
       (is= 0 (vy a))
       (is= 0 (vz a))
-      (let [c (vec3/add (vec3/vec3) b b)]
+      (let [c (vec3/add b b (vec3/vec3))]
         (is= (* -2 x) (vx c))
         (is= (* -2 y) (vy c))
         (is= (* -2 z) (vz c)))))
@@ -64,12 +64,12 @@
       (is= (* 2 x) (vx a))
       (is= (* 2 y) (vy a))
       (is= (* 2 z) (vz a))
-      (let [c (vec3/sub (vec3/vec3) a a)]
+      (let [c (vec3/sub a a (vec3/vec3))]
         (are-elements-roughly= c [0 0 0]))))
   (testing "'multiplyVectors'"
     (let [a (vec3/vec3 x y z)
           b (vec3/vec3 2 3 -5)
-          c (vec3/mult (vec3/vec3) a b)]
+          c (vec3/mult a b (vec3/vec3))]
       (is= (vx c) (* x 2))
       (is= (vy c) (* y 3))
       (is= (vz c) (* z -5))))
@@ -107,7 +107,7 @@
     (is (roughly= (vx a) (/ (vx b) (vw b))))
     (is (roughly= (vy a) (/ (vy b) (vw b))))
     (is (roughly= (vz a) (/ (vz b) (vw b))))
-    (mat4/makeTranslate m 3 2 1)
+    (mat4/makeTranslation m 3 2 1)
     (vec3/applyMat4 a m)
     (vec4/applyMat4 b m)
     (is (roughly= (vx a) (/ (vx b) (vw b))))
@@ -132,7 +132,7 @@
           b (vec3/vec3 x (- y) z)
           c (vec3/vec3)
           control (vec3/vec3 24 0 -12)]
-      (vec3/cross c a b)
+      (vec3/cross a b c)
       (are-elements-roughly= c control))))
 
 (deftest normalize-test
@@ -254,9 +254,9 @@
     (let [a (vec3/vec3 x y z)
           b (vec3/vec3 (- x) (- y) (- z))
           c (vec3/vec3)]
-      (vec3/vmin (vec3/copy c a) b)
+      (vec3/vmin b a c)
       (are-elements-roughly= c [(- x) (- y) (- z)])
-      (vec3/vmax (vec3/copy c a) b)
+      (vec3/vmax b a c)
       (are-elements-roughly= c [x y z])
       (vec3/setFromValues c (* -2 x) (* 2 y) (* -2 z))
       (vec3/clamp c b a)
@@ -289,16 +289,15 @@
       (vec3/setFromValues a x y z)
       (is= (+ (m/abs x) (m/abs y) (m/abs z)) (vec3/manhattanLength a))))
   (testing  "reflect"
-    (let [a (vec3/vec3)
+    (let [a (vec3/vec3 0 -1 0)
           normal (vec3/vec3 0 1 0)
           b (vec3/vec3)]
-      (vec3/setFromValues a 0 -1 0)
-      (are-elements-roughly= (vec3/reflect (vec3/copy b a) normal) [0 1 0])
+      (are-elements-roughly= (vec3/reflect a normal b) [0 1 0])
       (vec3/setFromValues a 1 -1 0)
-      (are-elements-roughly= (vec3/reflect (vec3/copy b a) normal) [1 1 0])
+      (are-elements-roughly= (vec3/reflect a normal b) [1 1 0])
       (vec3/setFromValues a 1 -1 0)
       (vec3/setFromValues normal 0 -1 0)
-      (are-elements-roughly= (vec3/reflect (vec3/copy b a) normal) [1 1 0])))
+      (are-elements-roughly= (vec3/reflect a normal b) [1 1 0])))
   (testing "angleTo"
     (let [a (vec3/vec3 0, -0.18851655680720186, 0.9820700116639124)
           b (vec3/vec3 0, 0.18851655680720186, -0.9820700116639124)]

@@ -29,7 +29,7 @@
         o (object3D)
         _(.set spherical 800 phi theta)
         _(vec3/setFromSpherical (.-position o)  spherical)
-        _(vec3/multiplyScalar (vec3/copy v (.-position o)) 2)
+        _(vec3/multScalar (vec3/copy v (.-position o)) 2)
         _(.lookAt o v)]
     o))
 

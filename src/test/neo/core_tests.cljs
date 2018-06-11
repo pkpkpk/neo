@@ -50,10 +50,10 @@
         everytick #(put! c :everytick)
         nexttick #(put! c :nexttick)
         ownerA {:id :a}
-        xa (neo/Tweener 0)
-        ya (neo/Tweener 0)
+        xa (neo/tweener 0)
+        ya (neo/tweener 0)
         ownerB {:id :b}
-        xb (neo/Tweener 0)
+        xb (neo/tweener 0)
         expired (chan)]
     (async done
       (go

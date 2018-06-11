@@ -63,14 +63,14 @@
             (vec3/sub (vec3/copy this.eye this.camera.position) (.-target this))
             (vec3/normalize (vec3/copy eyeDirection this.eye))
             (vec3/normalize (vec3/copy objectUpDirection this.camera.up))
-            (vec3/normalize (vec3/cross objectSidewaysDirection objectUpDirection eyeDirection))
+            (vec3/normalize (vec3/cross objectUpDirection eyeDirection objectSidewaysDirection))
 
             (vec3/setLength objectUpDirection (- (vy this.moveCurr) (vy this.movePrev) ))
             (vec3/setLength objectSidewaysDirection (- (vx this.moveCurr) (vx this.movePrev) ))
 
             (vec3/copy moveDirection (vec3/add objectUpDirection objectSidewaysDirection))
 
-            (vec3/normalize (vec3/cross axis moveDirection this.eye))
+            (vec3/normalize (vec3/cross moveDirection this.eye axis))
 
             (let [angle (* angle (.-rotateSpeed this))]
               (quat/setFromAxisAngle quaternion axis angle)
@@ -130,10 +130,10 @@
   (let [eye this.eye]
     (when (or (not this.noZoom) (not this.noPan))
       (when (< (m/pow this.maxDistance 2) (vec3/lengthSq eye))
-        (vec3/add this.camera.position this.target (vec3/setLength eye this.maxDistance))
+        (vec3/add  this.target (vec3/setLength eye this.maxDistance) this.camera.position)
         (vec2/copy this.zoomStart this.zoomEnd))
       (when (< (vec3/lengthSq eye) (m/pow this.minDistance 2))
-        (vec3/add this.camera.position this.target (vec3/setLength eye this.minDistance))
+        (vec3/add  this.target (vec3/setLength eye this.minDistance) this.camera.position)
         (vec2/copy this.zoomStart this.zoomEnd)))))
 
 ; (defn reset-trackball
@@ -280,14 +280,14 @@
 (defn update-trackball [render-fn]
   (fn update-trackball [this]
     (let [eye this.eye]
-      (vec3/sub eye this.camera.position this.target)
+      (vec3/sub this.camera.position this.target eye)
       (if-not this.noRotate
         (.rotateCamera this))
       (if-not this.noZoom
         (.zoomCamera this))
       (if-not this.noPan
         (.panCamera this))
-      (vec3/add this.camera.position this.target eye)
+      (vec3/add this.target eye this.camera.position)
       (.checkDistances this)
       (.lookAt this.camera this.target)
       (when (< EPS (vec3/distanceSq this.lastPosition this.camera.position))

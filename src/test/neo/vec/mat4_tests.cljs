@@ -18,12 +18,12 @@
     (doseq [n (range 16)]
       (is (= n (aget mat n))))))
 
-(deftest identity!-test
+(deftest ident-test
   (let [mat (mat4/ident)
         control (mat4/ident)]
     (is (= 1 (mat4/determinant mat)))
     (mat4/setFromValues mat 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15)
-    (are-elements-roughly= control (mat4/identity! mat))))
+    (are-elements-roughly= control (mat4/ident mat))))
 
 (deftest clone-test
   (let [a (mat4/createFromValues 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15)
@@ -158,7 +158,7 @@
         (testing "multiplying inverses should return identity"
           (let [product (mat4/mult m mInv (mat4/create))]
             (is (< (- (mat4/determinant product) 1) *eps*))
-            (are-elements-roughly= product (mat4/create-identity))))))))
+            (are-elements-roughly= product (mat4/ident))))))))
 
 (deftest compose+decompose-test
   (let [translations [(vec3/vec3)
@@ -207,18 +207,34 @@
           CONTROL (mat4/mult (mat4/makeTranslation x y z) m  (mat4/create))
           TEST (mat4/pre-translate! m x y z)]
       (are-elements-roughly= TEST CONTROL)))
+
   (testing "scale!"
     (let [m (mat4/createFromValues 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15)
           [x y z] [10 20 30]
           CONTROL (mat4/mult m (mat4/makeScale x y z)  (mat4/create))
           TEST (mat4/scale! m x y z)]
       (are-elements-roughly= TEST CONTROL)))
+
   (testing "pre-scale!"
+    (testing "arity-1"
+      (let [m (mat4/createFromValues 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15)
+            x 99.9
+            CONTROL (mat4/mult (mat4/makeScale x x 1) m  (mat4/create))
+            TEST (mat4/pre-scale! m x)]
+        (are-elements-roughly= TEST CONTROL)))
+    (testing "arity-2"
+      (let [m (mat4/createFromValues 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15)
+            x 99.9
+            y 102.7
+            CONTROL (mat4/mult (mat4/makeScale x y 1) m  (mat4/create))
+            TEST (mat4/pre-scale! m x y)]
+        (are-elements-roughly= TEST CONTROL)))
     (let [m (mat4/createFromValues 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15)
           [x y z] [10 20 30]
           CONTROL (mat4/mult (mat4/makeScale x y z) m  (mat4/create))
           TEST (mat4/pre-scale! m x y z)]
       (are-elements-roughly= TEST CONTROL)))
+
   (testing "rotateX!"
     (let [m (mat4/createFromValues 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15)
           angle (/ -pi 4)

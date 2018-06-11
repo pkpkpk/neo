@@ -28,8 +28,8 @@
 
 (defn ^boolean equals?
   "Returns true if the components of a are equal to the components of b.
-   @param {goog.vec.Vec3.AnyType} a
-   @param {goog.vec.Vec3.AnyType} b
+   @param {Vec3} a
+   @param {Vec3} b
    @return {boolean} True if the vectors are equal, false otherwise."
   [a b]
   (gvec3/equals a b))
@@ -47,17 +47,17 @@
 
 (defn setFromValues
   "Initializes the vector with the given values.
-   @param {goog.vec.Vec3.AnyType} v :: The vector to receive the values.
+   @param {Vec3} v :: The vector to receive the values.
    @param {number} x :: value for element at index 0.
    @param {number} y :: value for element at index 1.
    @param {number} z :: value for element at index 2.
-   @return {!goog.vec.Vec3.AnyType} mutated v"
+   @return {!Vec3} mutated v"
   [v x y z] (gvec3/setFromValues v x y z))
 
 (defn createFromArray
   "Creates a new Vec3 initialized with the value from the given array.
    @param {goog.vec.Vec3.Vec3Like} arr :: The source 3 element array.
-   @return {!goog.vec.Vec3.Type} The new 3 element array."
+   @return {!Vec3} The new 3 element array."
   [arr]
   (if ^boolean useFloat32
     (gvec3/createFloat32FromArray arr)
@@ -65,9 +65,9 @@
 
 (defn setFromArray
   "Initializes the vector with the given array of values.
-   @param {goog.vec.Vec3.AnyType} v :: The vector to receive the values.
-   @param {goog.vec.Vec3.AnyType} arr :: The array of values.
-   @return {!goog.vec.Vec3.AnyType} mutated v"
+   @param {Vec3} v :: The vector to receive the values.
+   @param {Vec3} arr :: The array of values.
+   @return {!Vec3} mutated v"
   ([v arr](setFromArray v arr 0))
   ([v arr offset]
    (setFromValues v (aget arr offset)
@@ -79,78 +79,78 @@
 
 (defn add
   "component-wise addition of a and b
-   @param {goog.vec.Vec3.AnyType} res :: optional vec to store results in
-   @param {goog.vec.Vec3.AnyType} a
-   @param {goog.vec.Vec3.AnyType} b
-   @return {!goog.vec.Vec3.AnyType} mutated res, defaults to a"
+   @param {Vec3} a
+   @param {Vec3} b
+   @param {?Vec3} result :: optional vec to store results in
+   @return {!Vec3} mutated result, defaults to a"
   ([a b] (gvec3/add a b a))
-  ([res a b](gvec3/add a b res)))
+  ([a b result](gvec3/add a b result)))
 
 (defn sub
   "component-wise subtraction of a and b
-   @param {goog.vec.Vec3.AnyType} res :: optional vec to store results in
-   @param {goog.vec.Vec3.AnyType} a
-   @param {goog.vec.Vec3.AnyType} b
-   @return {!goog.vec.Vec3.AnyType} mutated res, defaults to a"
+   @param {Vec3} a
+   @param {Vec3} b
+   @param {?Vec3} result :: optional vec to store results in
+   @return {!Vec3} mutated result, defaults to a"
   ([a b] (gvec3/subtract a b a))
-  ([res a b](gvec3/subtract a b res)))
+  ([a b result](gvec3/subtract a b result)))
 
 (defn mult
   "component-wise multiplication of a and b
-   @param {goog.vec.Vec3.AnyType} res :: optional vec to store results in
-   @param {goog.vec.Vec3.AnyType} a
-   @param {goog.vec.Vec3.AnyType} b
-   @return {!goog.vec.Vec3.AnyType} mutated res, defaults to a"
+   @param {Vec3} a
+   @param {Vec3} b
+   @param {?Vec3} result :: optional vec to store results in
+   @return {!Vec3} mutated result, defaults to a"
   ([a b]
    (vsetx* a (vx b))
    (vsety* a (vy b))
    (vsetz* a (vz b))
    a)
-  ([res a b]
-   (vsetx res (* (vx a) (vx b)))
-   (vsety res (* (vy a) (vy b)))
-   (vsetz res (* (vz a) (vz b)))
-   res))
+  ([a b result]
+   (vsetx result (* (vx a) (vx b)))
+   (vsety result (* (vy a) (vy b)))
+   (vsetz result (* (vz a) (vz b)))
+   result))
 
 (defn div
   "component-wise division of a and b
-   @param {goog.vec.Vec3.AnyType} res :: optional vec to store results in
-   @param {goog.vec.Vec3.AnyType} a
-   @param {goog.vec.Vec3.AnyType} b
-   @return {!goog.vec.Vec3.AnyType} mutated res, defaults to a"
+   @param {Vec3} a
+   @param {Vec3} b
+   @param {?Vec3} result :: optional vec to store results in
+   @return {!Vec3} mutated res, defaults to a"
   ([a b]
    (vsetx* a (/ 1 (vx b)))
    (vsety* a (/ 1 (vy b)))
    (vsetz* a (/ 1 (vz b)))
    a)
-  ([res a b]
-   (vsetx res (/ (vx a) (vx b)))
-   (vsety res (/ (vy a) (vy b)))
-   (vsetz res (/ (vz a) (vz b)))
-   res))
+  ([a b result]
+   (vsetx result (/ (vx a) (vx b)))
+   (vsety result (/ (vy a) (vy b)))
+   (vsetz result (/ (vz a) (vz b)))
+   result))
 
 (defn cross
   "Computes the vector (cross) product of a and b
-   @param {goog.vec.Vec3.AnyType} res :: optional vec to store results in
-   @param {goog.vec.Vec3.AnyType} a
-   @param {goog.vec.Vec3.AnyType} b
-   @return {!goog.vec.Vec3.AnyType} mutated res, defaults to a"
+   @param {Vec3} res :: optional vec to store results in
+   @param {Vec3} a
+   @param {Vec3} b
+   @return {!Vec3} mutated res, defaults to a"
   ([a b] (gvec3/cross a b a))
-  ([res a b] (gvec3/cross a b res)))
+  ([a b result] (gvec3/cross a b result)))
 
 (defn ^number dot
   "Returns the scalar product of vectors a and b.
-   @param {goog.vec.Vec3.AnyType} a
-   @param {goog.vec.Vec3.AnyType} b
+   @param {Vec3} a
+   @param {Vec3} b
    @return {number} The scalar product."
   [a b]
   (gvec3/dot a b))
 
 (defn setScalar
   "Set all components of v to the scalar value
-   @param {goog.vec.Vec3.AnyType} v
+   @param {Vec3} v
    @param {number} s :: the scalar value
-   @return {!goog.vec.Vec3.AnyType} mutated v"
+   @return {!Vec3} mutated v"
   [v s]
   (vsetx v s)
   (vsety v s)
@@ -159,9 +159,9 @@
 
 (defn addScalar
   "Add the scalar value to all components of v
-   @param {goog.vec.Vec3.AnyType} v
+   @param {Vec3} v
    @param {number} s :: the scalar value
-   @return {!goog.vec.Vec3.AnyType} mutated v"
+   @return {!Vec3} mutated v"
   [v s]
   (vsetx+ v s)
   (vsety+ v s)
@@ -170,9 +170,9 @@
 
 (defn subScalar
   "Subtract the scalar value to all components of v
-   @param {goog.vec.Vec3.AnyType} v
+   @param {Vec3} v
    @param {number} s :: the scalar value
-   @return {!goog.vec.Vec3.AnyType} mutated v"
+   @return {!Vec3} mutated v"
   [v s]
   (vsetx- v s)
   (vsety- v s)
@@ -181,49 +181,49 @@
 
 (defn multScalar
   "Multiply each component of v with the scalar value
-   @param {goog.vec.Vec3.AnyType} res :: optional vec to store results in
-   @param {goog.vec.Vec3.AnyType} v :: The vector to scale
+   @param {Vec3} v :: The vector to scale
    @param {number} scalar :: The scalar value
-   @return {!goog.vec.Vec3.AnyType} mutated res, defaults to v"
+   @param {?Vec3} result :: optional vec to store results in
+   @return {!Vec3} mutated result, defaults to v"
   ([v scalar] (gvec3/scale v scalar v))
-  ([res v scalar] (gvec3/scale v scalar res)))
+  ([v scalar result] (gvec3/scale v scalar result)))
 
 (defn divScalar
   "Divide each component of v with the scalar value
-   @param {goog.vec.Vec3.AnyType} res :: optional vec to store results in
-   @param {goog.vec.Vec3.AnyType} v :: The vector to scale
+   @param {Vec3} res :: optional vec to store results in
+   @param {Vec3} v :: The vector to scale
    @param {number} scalar :: The scalar value
-   @return {!goog.vec.Vec3.AnyType} mutated res, defaults to v"
+   @return {!Vec3} mutated res, defaults to v"
   ([v scalar] (gvec3/scale v (/ 1 scalar) v))
-  ([res v scalar] (gvec3/scale v (/ 1 scalar) res)))
+  ([v scalar result] (gvec3/scale v (/ 1 scalar) result)))
 
 (def ^{:doc "alias for multScalar"} scale multScalar)
 
 (defn addScaledVector
   "Add a scaled component in a single call.
    Equivalent to `(addScalar a (multScalar b s))`
-   @param {goog.vec.Vec3.AnyType} res :: optional vec to store results in
-   @param {goog.vec.Vec3.AnyType} a
-   @param {goog.vec.Vec3.AnyType} b
+   @param {Vec3} a
+   @param {Vec3} b
    @param {number} scalar :: The scalar value
-   @return {!goog.vec.Vec3.AnyType} mutated res, defaults to a"
+   @param {?Vec3} result :: optional vec to store results in
+   @return {!Vec3} mutated res, defaults to a"
   ([a b s]
    (vsetx+ a (* (vx b) s))
    (vsety+ a (* (vy b) s))
    (vsetz+ a (* (vz b) s))
    a)
-  ([res a b s]
-   (vsetx res (+ (vx a) (* (vx b) s)))
-   (vsety res (+ (vx a) (* (vy b) s)))
-   (vsetz res (+ (vx a) (* (vz b) s)))
-   res))
+  ([a b s result]
+   (vsetx result (+ (vx a) (* (vx b) s)))
+   (vsety result (+ (vx a) (* (vy b) s)))
+   (vsetz result (+ (vx a) (* (vz b) s)))
+   result))
 
 (defn negate
-  "@param {goog.vec.Vec3.AnyType} res :: optional vec to store results in
-   @param {goog.vec.Vec3.AnyType} v :: The vector to negate.
-   @return {!goog.vec.Vec3.AnyType} mutated res, defaults to v"
+  "@param {Vec3} v :: The vector to negate.
+   @param {?Vec3} result :: optional vec to store results in
+   @return {!Vec3} mutated res, defaults to v"
   ([v] (gvec3/negate v v))
-  ([res v](gvec3/negate v res)))
+  ([v result](gvec3/negate v result)))
 
 (defn ^number length
   "@param {Vec3} v
@@ -237,26 +237,26 @@
 
 (defn normalize
   "Normalizes the given vector storing the result into resultVec.
-   @param {goog.vec.Vec3.AnyType} res :: optional vec to store results in
-   @param {goog.vec.Vec3.AnyType} v :: The vector to normalize.
-   @return {!goog.vec.Vec3.AnyType} mutated res, defaults to v"
+   @param {Vec3} v :: The vector to normalize.
+   @param {Vec3} result :: optional vec to store results in
+   @return {!Vec3} mutated res, defaults to v"
   ([v] (gvec3/normalize v v))
-  ([res v] (gvec3/normalize v res)))
+  ([v result] (gvec3/normalize v result)))
 
 (defn checked-normalize
   "Normalizes the given vector storing the result into resultVec.
    The null vec returns itself (instead of NaNs)
-   @param {goog.vec.Vec3.AnyType} res :: optional vec to store results in
-   @param {goog.vec.Vec3.AnyType} v :: The vector to normalize.
-   @return {!goog.vec.Vec3.AnyType} mutated res, defaults to v"
+   @param {Vec3} v :: The vector to normalize.
+   @param {?Vec3} result:: optional vec to store results in
+   @return {!Vec3} mutated res, defaults to v"
   ([v]
    (if (== 0 (vx v) (vy v) (vz v))
      v
      (gvec3/normalize v v)))
-  ([res v]
+  ([v result]
    (if (== 0 (vx v) (vy v) (vz v))
      v
-     (gvec3/normalize v res))))
+     (gvec3/normalize v result))))
 
 (defn setLength
   "Set the magnitude of v to a scalar valule
@@ -268,15 +268,15 @@
 
 (defn ^number distance
   "Returns the distance between two points.
-   @param {goog.vec.Vec3.AnyType} a
-   @param {goog.vec.Vec3.AnyType} b
+   @param {Vec3} a
+   @param {Vec3} b
    @return {number} The distance between the points."
   [a b] (gvec3/distance a b))
 
 (defn ^number distanceSq
   "Returns the squared distance between two points.
-   @param {goog.vec.Vec3.AnyType} a
-   @param {goog.vec.Vec3.AnyType} b
+   @param {Vec3} a
+   @param {Vec3} b
    @return {number} The squared distance between the points."
   [a b] (gvec3/distanceSquared a b))
 
@@ -297,12 +297,12 @@
 (defn direction
   "Returns a unit vector pointing from one point to another.
    If the input points are equal then the result will be all zeros.
-   @param {goog.vec.Vec3.AnyType} res :: optional vec to store results in
-   @param {goog.vec.Vec3.AnyType} a
-   @param {goog.vec.Vec3.AnyType} b
-   @return {!goog.vec.Vec3.AnyType} mutated res, defaults to a"
+   @param {Vec3} a
+   @param {Vec3} b
+   @param {Vec3} result :: optional vec to store results in
+   @return {!Vec3} mutated res, defaults to a"
   ([a b] (gvec3/direction a b a))
-  ([res a b](gvec3/direction a b res)))
+  ([a b result](gvec3/direction a b result)))
 
 (defn ^number angleTo
   "@param {Vec3} a
@@ -321,20 +321,21 @@
   reflect
   (let [_v (vec3)]
     (fn reflect
-      ([v normal](reflect v v normal))
-      ([res v normal]
-       (sub res v (multScalar (copy _v normal) (* 2 (dot v normal))))))))
+      ([v normal](reflect v normal v))
+      ([v normal result]
+       (let [mag  (* 2 (dot v normal))]
+         (sub v (multScalar (copy _v normal) mag) result))))))
 
 (defn lerp
   "Linearly interpolate from a to b according to f. The value of f should be
    in the range [0..1] otherwise the results are undefined.
-   @param {goog.vec.Vec3.AnyType} res :: optional vec to store results in
-   @param {goog.vec.Vec3.AnyType} a
-   @param {goog.vec.Vec3.AnyType} b
+   @param {Vec3} a
+   @param {Vec3} b
    @param {number} f The interpolation factor.
-   @return {!goog.vec.Vec3.AnyType} mutated res, defaults to a"
+   @param {?Vec3} result :: optional vec to store results in
+   @return {!Vec3} mutated result, defaults to a"
   ([a b f](gvec3/lerp a b f a))
-  ([res a b f] (gvec3/lerp a b f res)))
+  ([a b f result](gvec3/lerp a b f result)))
 
 (defn clamp
   "component-wise clamp values between two vectors.
@@ -373,34 +374,34 @@
 
 (defn vmin
   "component-wise minimum
-   @param {goog.vec.Vec3.AnyType} res :: optional vec to store results in
-   @param {goog.vec.Vec3.AnyType} v The source vector.
-   @param {goog.vec.Vec3.AnyType|number} limit :: The limit vector or scalar
-   @return {!goog.vec.Vec3.AnyType} mutated res, defaults to v"
+   @param {Vec3} v The source vector.
+   @param {Vec3|number} limit :: The limit vector or scalar
+   @param {Vec3} res :: optional vec to store results in
+   @return {!Vec3} mutated res, defaults to v"
   ([v limit] (gvec3/min v limit v))
-  ([res v limit](gvec3/min v limit res)))
+  ([v limit result](gvec3/min v limit result)))
 
 (defn vmax
   "component-wise maximum
-   @param {goog.vec.Vec3.AnyType} res :: optional vec to store results in
-   @param {goog.vec.Vec3.AnyType} v The source vector.
-   @param {goog.vec.Vec3.AnyType|number} limit :: The limit vector or scalar
-   @return {!goog.vec.Vec3.AnyType} mutated res, defaults to v"
+   @param {Vec3} res :: optional vec to store results in
+   @param {Vec3} v The source vector.
+   @param {Vec3|number} limit :: The limit vector or scalar
+   @return {!Vec3} mutated res, defaults to v"
   ([v limit] (gvec3/max v limit v))
-  ([res v limit](gvec3/max v limit res)))
+  ([v limit result](gvec3/max v limit result)))
 
 (defn abs
   "component-wise absolute values
-   @param {goog.vec.Vec3.AnyType} res :: optional vec to store results in
-   @param {goog.vec.Vec3.AnyType} v
-   @return {!goog.vec.Vec3.AnyType} mutated res, defaults to v"
+   @param {Vec3} res :: optional vec to store results in
+   @param {Vec3} v
+   @return {!Vec3} mutated res, defaults to v"
   ([v] (gvec3/abs v v))
-  ([result v] (gvec3/abs v result)))
+  ([v result] (gvec3/abs v result)))
 
 (defn floor
   "component-wise floor
-   @param {goog.vec.Vec3.AnyType} v
-   @return {!goog.vec.Vec3.AnyType} mutated v"
+   @param {Vec3} v
+   @return {!Vec3} mutated v"
   [v]
   (vsetx v (m/floor (vx v)))
   (vsety v (m/floor (vy v)))
@@ -409,8 +410,8 @@
 
 (defn ceil
   "component-wise ceil
-   @param {goog.vec.Vec3.AnyType} v
-   @return {!goog.vec.Vec3.AnyType} mutated v"
+   @param {Vec3} v
+   @return {!Vec3} mutated v"
   [v]
   (vsetx v (m/ceil (vx v)))
   (vsety v (m/ceil (vy v)))
@@ -419,8 +420,8 @@
 
 (defn round
   "component-wise round
-   @param {goog.vec.Vec3.AnyType} v
-   @return {!goog.vec.Vec3.AnyType} mutated v"
+   @param {Vec3} v
+   @return {!Vec3} mutated v"
   [v]
   (vsetx v (m/round (vx v)))
   (vsety v (m/round (vy v)))
