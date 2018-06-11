@@ -148,6 +148,9 @@
     (.onChangeCallback this)
     this))
 
+(defn mat4->quat [mat]
+  (setFromRotationMatrix (quaternion) mat))
+
 (defn setFromEuler
   "@return{!Quaternion}"
   ([this euler] (setFromEuler this euler false))
