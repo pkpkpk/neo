@@ -360,7 +360,7 @@
         (assert (and (valid-array? to) (<= (alength from) (alength to))))))
     (start-tweening! this transition)))
 
-(defn Tweener
+(defn tweener
   "@param{(Object|IArrayLike|Number)} v
    @return{(NumTweener|ArrayTweener|ObjectTweener)}"
   [v]
