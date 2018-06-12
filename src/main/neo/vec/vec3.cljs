@@ -6,7 +6,9 @@
                                        vsetx* vsety* vsetz*
                                        goog-typedef]])
   (:require [neo.math :as m :include-macros true]
-            [goog.vec.Vec3 :as gvec3]))
+            [goog.vec.Vec3 :as gvec3]
+            [goog.vec.Mat4 :as gmat]
+            [goog.vec.Quaternion :as gq]))
 
 (goog-define useFloat32 false)
 
@@ -448,26 +450,6 @@
     (vsetz this z')
     this))
 
-(defn applyQuaternion [this q]
-  (let [x (vx this)
-        y (vy this)
-        z (vz this)
-        qx (vx q)
-        qy (vy q)
-        qz (vz q)
-        qw (vw q)
-        ix (+ (* qw x) (* qy z) (- (* qz y)))
-        iy (+ (* qw y) (* qz x) (- (* qx z)))
-        iz (+ (* qw z) (* qx y) (- (* qy x)))
-        iw (+ (- (* qx x)) (-  (* qy y)) (- (* qz z)))
-        x' (+ (* qw ix) (* iw (- qx)) (* iy (- qz)) (- (* iz (- qy))))
-        y' (+ (* iy qw) (* iw (- qy)) (* iz (- qx)) (- (* ix (- qz))))
-        z' (+ (* iz qw) (* iw (- qz)) (* ix (- qy)) (- (* iy (- qx))))]
-    (vsetx this x')
-    (vsety this y')
-    (vsetz this z')
-    this))
-
 (defn setFromMatrixColumn [v mat col-index]
   (setFromArray v mat (* col-index 4)))
 
@@ -486,27 +468,14 @@
     (vsetz v sz)
     v))
 
-(defn applyMat4 [v mat]
-  (let [x (vx v) y (vy v) z (vz v)
-        w (/ 1 (+ (* x (aget mat 3))
-                  (* y (aget mat 7))
-                  (* z (aget mat 11))
-                  (aget mat 15)))
-        x' (* w (+ (* x (aget mat 0))
-                   (* y (aget mat 4))
-                   (* z (aget mat 8))
-                   (aget mat 12)))
-        y' (* w (+ (* x (aget mat 1))
-                   (* y (aget mat 5))
-                   (* z (aget mat 9))
-                   (aget mat 13)))
-        z' (* w (+ (* x (aget mat 2))
-                   (* y (aget mat 6))
-                   (* z (aget mat 10))
-                   (aget mat 14)))]
-    (vsetx v x')
-    (vsety v y')
-    (vsetz v z')
-    v))
+(defn applyQuaternion
+  ([v q] (gq/transformVec v q v))
+  ([v q result] (gq/transformVec v q result)))
+
+(defn applyMat4 ;=> projective
+  ([v mat]
+   (gmat/multVec3Projective mat v v))
+  ([v mat result]
+   (gmat/multVec3Projective mat v result)))
 
 

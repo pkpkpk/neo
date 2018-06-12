@@ -5,9 +5,6 @@
             [goog.vec.Quaternion :as gq]))
 
 ; setFromUnitVectors
-; inverse
-; conjugate
-; dot
 ; slerp
 ; slerpFlat
 
@@ -53,13 +50,31 @@
   (.onChangeCallback this)
   this)
 
-(def lengthSq gq/magnitudeSquared)
+(defn add
+  ([a b]
+   (gq/add a b a))
+  ([a b result]
+   (gq/add a b result)))
 
-(defn length
-  "@param {!Quaternion} q
-   @return {!number}"
-  [q]
-  (gq/magnitude q))
+(def dot gq/dot)
+
+(defn conjugate
+  ([q]
+   (gq/conjugate q q))
+  ([q result]
+   (gq/conjugate q result)))
+
+(defn negate
+  ([q]
+   (gq/negate q q))
+  ([q result]
+   (gq/negate q result)))
+
+(defn invert
+  ([q]
+   (gq/invert q q))
+  ([q result]
+   (gq/invert q result)))
 
 (defn mult
   "@return {!Quaternion}"
@@ -83,6 +98,53 @@
      (.onChangeCallback result)
      result)))
 
+(defn scale
+  ([q scalar]
+   (gq/scale q scalar q))
+  ([q scalar result]
+   (gq/scale q scalar result)))
+
+(defn rotateX
+  ([q angle]
+   (gq/rotateX q angle q))
+  ([q angle result]
+   (gq/rotateX q angle result)))
+
+(defn rotateY
+  ([q angle]
+   (gq/rotateY q angle q))
+  ([q angle result]
+   (gq/rotateY q angle result)))
+
+(defn rotateZ
+  ([q angle]
+   (gq/rotateZ q angle q))
+  ([q angle result]
+   (gq/rotateZ q angle result)))
+
+(defn ^number angle-to-axis
+  [q axis]
+  (gq/toAngleAxis q axis))
+
+(defn transform-vec ;; same as vec3 applyQuaternion => vec
+  "Transforms a vec with a quaternion. Works on both vec3 and vec4
+   @param {!goog.vec.AnyType} vec :: The vec to transform.
+   @param {!Quaternion} quat
+   @param {?goog.vec.AnyType} result :: The vec to receive the result.
+   @return {!goog.vec.AnyType}"
+  ([q vec]
+   (gq/transformVec vec q vec))
+  ([q vec result]
+   (gq/transformVec vec q result)))
+
+(defn length
+  "@param {!Quaternion} q
+   @return {!number}"
+  [q]
+  (gq/magnitude q))
+
+(def lengthSq gq/magnitudeSquared)
+
 (defn normalize
   "@param {!Quaternion} q
    @return {!Quaternion}"
@@ -102,51 +164,14 @@
     (normalize q)))
 
 (defn setFromRotationMatrix
-  "+ assumes the upper 3x3 of m is a pure rotation matrix (i.e, unscaled)
-   + assumes quaternion is normalized
+  "Generates the quaternion from the given 4x4 rotation matrix.
+   @param {!Quaternion} quat :: The resulting quaternion..
+   @param {!goog.vec.AnyType} matrix The source matrix.
    @return{!Quaternion}"
-  [this m]
-  (let [m00 (aget m 0)
-        m10 (aget m 1)
-        m20 (aget m 2)
-        m01 (aget m 4)
-        m11 (aget m 5)
-        m21 (aget m 6)
-        m02 (aget m 8)
-        m12 (aget m 9)
-        m22 (aget m 10)
-        trace (+ m00 m11 m22)]
-    (cond
-      (< 0 trace)
-      (let [s (/ 0.5 (m/sqrt (inc trace)))]
-        (vsetw this (/ 0.25 s))
-        (vsetx this (* s (- m21 m12)))
-        (vsety this (* s (- m02 m20)))
-        (vsetz this (* s (- m10 m01))))
-
-      (and (< m11 m00) (< m22 m00))
-      (let [s (* 2 (m/sqrt (- (inc m00) m11 m22)))]
-        (vsetw this (/ (- m21 m12) s))
-        (vsetx this (* 0.25 s))
-        (vsety this (/ (+ m01 m10) s))
-        (vsetz this (/ (+ m02 m20) s)))
-
-      (< m22 m11)
-      (let [s (* 2 (m/sqrt (- (inc m11) m00 m22)))]
-        (vsetw this (/ (- m02 m20) s))
-        (vsetx this (/ (+ m01 m10) s))
-        (vsety this (* 0.25 s))
-        (vsetz this (/ (+ m12 m21) s)))
-
-      :else
-      (let [s (* 2 (m/sqrt (- (inc m22) m00 m11)))]
-        (vsetw this (/ (- m10 m01) s))
-        (vsetx this (/ (+ m02 m20) s))
-        (vsety this (/ (+ m12 m21) s))
-        (vsetz this (* 0.25 s))))
-
-    (.onChangeCallback this)
-    this))
+  [q mat]
+  (gq/fromRotationMatrix4 mat q)
+  (.onChangeCallback q)
+  q)
 
 (defn mat4->quat [mat]
   (setFromRotationMatrix (quaternion) mat))

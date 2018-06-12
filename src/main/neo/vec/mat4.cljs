@@ -3,6 +3,7 @@
                    [neo.vec.compiler :as c])
   (:require [neo.math :as m :include-macros true :refer [sin cos tan]]
             [goog.vec.Mat4 :as gmat]
+            [goog.vec.Quaternion :as gq]
             [neo.vec.vec3 :as vec3]
             [neo.vec.quaternion :as quat]))
 
@@ -276,39 +277,7 @@
 
 (defn makeRotationFromQuaternion
   [m q]
-  (let [x (vx q)
-        y (vy q)
-        z (vz q)
-        w (vw q)
-        x2 (+ x x)
-        y2 (+ y y)
-        z2 (+ z z)
-        xx (* x x2)
-        xy (* x y2)
-        xz (* x z2)
-        yy (* y y2)
-        yz (* y z2)
-        zz (* z z2)
-        wx (* w x2)
-        wy (* w y2)
-        wz (* w z2)]
-    (aset m  0  (- 1 (+ yy zz)))
-    (aset m  1 (+ xy wz))
-    (aset m  2 (- xz wy))
-    (aset m  3 0)
-    (aset m  4 (- xy wz))
-    (aset m  5 (- 1 (+ xx zz)))
-    (aset m  6 (+ yz wx))
-    (aset m  7 0)
-    (aset m  8 (+ xz wy))
-    (aset m  9 (- yz wx))
-    (aset m 10 (- 1 (+ xx yy)))
-    (aset m 11 0)
-    (aset m 12 0)
-    (aset m 13 0)
-    (aset m 14 0)
-    (aset m 15 1)
-    m))
+  (gq/toRotationMatrix4 q m))
 
 (defn quat->mat4
   "@param {!quat/Quaternion}
