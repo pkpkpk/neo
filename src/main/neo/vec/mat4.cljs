@@ -106,11 +106,13 @@
   ([mat scalar] (gmat/multScalar mat scalar mat))
   ([mat scalar result] (gmat/multScalar mat scalar result)))
 
-(defn makeTranslation
+(defn translate
   ([x y z]
    (gmat/makeTranslate (create) x y z))
   ([mat x y z]
    (gmat/makeTranslate mat x y z)))
+
+(def makeTranslation translate)
 
 (defn translate!
   "shortcut for (mult m (translate x y z))
@@ -126,9 +128,11 @@
   ([m x y z]
    (c/mat4-mult [1 0 0 0,  0 1 0 0,  0 0 1 0,  x y z 1] m)))
 
-(defn makeScale
+(defn scale
   ([x y z] (gmat/makeScale (create) x y z))
   ([m x y z] (gmat/makeScale m x y z)))
+
+(def makeScale scale)
 
 (defn scale!
   "Shortcut for (mult m (scale x ?y ?z))
@@ -149,9 +153,11 @@
   ([m sx sy sz]
    (c/mat4-mult [sx 0 0 0, 0 sy 0 0, 0 0 sz 0, 0 0 0 1] m)))
 
-(defn makeRotateX
+(defn rotateX
   ([angle] (gmat/makeRotateX (create) angle))
   ([mat angle] (gmat/makeRotateX mat angle)))
+
+(def makeRotateX rotateX)
 
 (defn rotateX!
   "Rotate the given matrix by angle about the x axis.  Equivalent to:
@@ -162,9 +168,11 @@
   [m theta]
   (c/mat4-mult m [1 0 0 0, 0 (cos theta) (sin theta) 0, 0 (- (sin theta)) (cos theta) 0, 0 0 0 1]))
 
-(defn makeRotateY
+(defn rotateY
   ([angle] (gmat/makeRotateY (create) angle))
   ([mat angle] (gmat/makeRotateY mat angle)))
+
+(def makeRotateY rotateY)
 
 (defn rotateY!
   "Rotate the given matrix by angle about the y axis.  Equivalent to:
@@ -175,9 +183,11 @@
   [m theta]
   (c/mat4-mult m [(cos theta) 0 (- (sin theta)) 0,  0 1 0 0,  (sin theta) 0 (cos theta) 0, 0 0 0 1]))
 
-(defn makeRotateZ
+(defn rotateZ
   ([angle] (gmat/makeRotateZ (create) angle))
   ([mat angle] (gmat/makeRotateZ mat angle)))
+
+(def makeRotateZ rotateZ)
 
 (defn rotateZ!
   "Rotate the given matrix by angle about the z axis. Equivalent to:
@@ -188,17 +198,21 @@
   [m theta]
   (c/mat4-mult m [(cos theta) (sin theta) 0 0 (- (sin theta)) (cos theta) 0 0 0 0 1 0 0 0 0 1]))
 
-(defn makeRotationAxis
+(defn rotateAxis
   ([axis angle](gmat/makeRotate create angle (vx axis) (vy axis) (vz axis)))
   ([mat axis angle] (gmat/makeRotate mat angle (vx axis) (vy axis) (vz axis))))
 
+(def makeRotationAxis rotateAxis)
+
 ; (defn rotate-axis! [m theta vec])
 
-(defn makeShear
+(defn shear
   "@return {!(Float64Array|Float32Array)} the shear matrix"
   ([psi theta phi] (makeShear (create) psi theta phi))
   ([m psi theta phi]
    (setFromValues m 1 (tan theta) 0 0, (tan psi) 1 0, 0 0 (tan phi) 1 0, 0 0 0 1)))
+
+(def makeShear shear)
 
 (defn shear!
   "shortcut for (mult m (shear phi theta psi))
@@ -416,10 +430,10 @@
         (mult m local-xform)
         m))))
 
+(def *eps* 1e-10)
 
-
-(defn epsilon [n]
-  (if ^boolean (< (m/abs n) 1e-10) ;;needs to be customizable
+(defn ^number epsilon [n]
+  (if (< (m/abs n) *eps*)
     0
     n))
 
