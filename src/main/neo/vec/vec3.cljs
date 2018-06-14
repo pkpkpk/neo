@@ -478,10 +478,3 @@
   ([v mat result]
    (gmat/multVec3Projective mat v result)))
 
-(def *eps* 1e-10)
-
-(defn ^number epsilon [n]
-  (if (< (m/abs n) *eps*)
-    0
-    n))
-

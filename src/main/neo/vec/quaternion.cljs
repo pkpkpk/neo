@@ -215,9 +215,3 @@
     (.onChangeCallback q)
     q))
 
-(def *eps* 1e-10)
-
-(defn ^number epsilon [n]
-  (if (< (m/abs n) *eps*)
-    0
-    n))
