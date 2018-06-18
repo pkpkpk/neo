@@ -60,7 +60,7 @@
 (deftest makeRotationAxis-test
   (let [axis (vec3/normalize (vec3/vec3 1.5 0 1.0))
         radians (m/deg->rad 45)
-        a (mat4/rotateAxis (mat4/create) axis radians)
+        a (mat4/rotate-axis axis radians)
         control (mat4/createFromValues
                  0.9098790095958609
                  0.39223227027636803

@@ -202,7 +202,7 @@
   (gmat/rotateZ m theta))
 
 (defn rotate-axis
-  ([axis angle](gmat/makeRotate create angle (vx axis) (vy axis) (vz axis)))
+  ([axis angle](gmat/makeRotate (create) angle (vx axis) (vy axis) (vz axis)))
   ([mat axis angle] (gmat/makeRotate mat angle (vx axis) (vy axis) (vz axis))))
 
 ; (defn rotate-axis! [m theta vec])
