@@ -101,13 +101,13 @@
 (deftest applyMat4-test
   (let [a (vec3/vec3 x y z)
         b (vec4/vec4 x y z 1)
-        m (mat4/makeRotateX (mat4/create) pi)]
+        m (mat4/rotateX (mat4/create) pi)]
     (vec3/applyMat4 a m)
     (vec4/applyMat4 b m)
     (is (roughly= (vx a) (/ (vx b) (vw b))))
     (is (roughly= (vy a) (/ (vy b) (vw b))))
     (is (roughly= (vz a) (/ (vz b) (vw b))))
-    (mat4/makeTranslation m 3 2 1)
+    (mat4/translate m 3 2 1)
     (vec3/applyMat4 a m)
     (vec4/applyMat4 b m)
     (is (roughly= (vx a) (/ (vx b) (vw b))))

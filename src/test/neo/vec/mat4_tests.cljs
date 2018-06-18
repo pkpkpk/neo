@@ -60,7 +60,7 @@
 (deftest makeRotationAxis-test
   (let [axis (vec3/normalize (vec3/vec3 1.5 0 1.0))
         radians (m/deg->rad 45)
-        a (mat4/makeRotationAxis (mat4/create) axis radians)
+        a (mat4/rotateAxis (mat4/create) axis radians)
         control (mat4/createFromValues
                  0.9098790095958609
                  0.39223227027636803
@@ -136,20 +136,20 @@
     (are-elements-roughly= a control)))
 
 (deftest invert-test
-  (let [mats [(mat4/makeRotateX (mat4/create) 0.3)
-              (mat4/makeRotateX (mat4/create) -0.3)
-              (mat4/makeRotateY (mat4/create) 0.3)
-              (mat4/makeRotateY (mat4/create) -0.3)
-              (mat4/makeRotateZ (mat4/create) 0.3)
-              (mat4/makeRotateZ (mat4/create) -0.3)
-              (mat4/makeScale (mat4/create) 1 2 3)
-              (mat4/makeScale (mat4/create) (/ 1 8) (/ 1 2) (/ 1 3))
+  (let [mats [(mat4/rotateX (mat4/create) 0.3)
+              (mat4/rotateX (mat4/create) -0.3)
+              (mat4/rotateY (mat4/create) 0.3)
+              (mat4/rotateY (mat4/create) -0.3)
+              (mat4/rotateZ (mat4/create) 0.3)
+              (mat4/rotateZ (mat4/create) -0.3)
+              (mat4/scale (mat4/create) 1 2 3)
+              (mat4/scale (mat4/create) (/ 1 8) (/ 1 2) (/ 1 3))
               (mat4/makePerspective (mat4/create) -1 1 1 -1 1 1000)
               (mat4/makePerspective (mat4/create) -16 16 9 -9 0.1 10000)
-              (mat4/makeTranslation (mat4/create) 1 2 3)]]
+              (mat4/translate (mat4/create) 1 2 3)]]
     (doseq [m mats]
       (let [mInv (mat4/create)
-            _(mat4/invert mInv m)
+            _(mat4/invert  m mInv)
             mSelfInverse (mat4/mclone m)]
         (mat4/invert mSelfInverse)
         (are-elements-roughly= mInv mSelfInverse)
@@ -198,20 +198,20 @@
   (testing "translate!"
     (let [m (mat4/createFromValues 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15)
           [x y z] [10 20 30]
-          CONTROL (mat4/mult m (mat4/makeTranslation x y z)  (mat4/create))
+          CONTROL (mat4/mult m (mat4/translate x y z)  (mat4/create))
           TEST (mat4/translate! m x y z)]
       (are-elements-roughly= TEST CONTROL)))
   (testing "pre-translate!"
     (let [m (mat4/createFromValues 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15)
           [x y z] [10 20 30]
-          CONTROL (mat4/mult (mat4/makeTranslation x y z) m  (mat4/create))
+          CONTROL (mat4/mult (mat4/translate x y z) m  (mat4/create))
           TEST (mat4/pre-translate! m x y z)]
       (are-elements-roughly= TEST CONTROL)))
 
   (testing "scale!"
     (let [m (mat4/createFromValues 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15)
           [x y z] [10 20 30]
-          CONTROL (mat4/mult m (mat4/makeScale x y z)  (mat4/create))
+          CONTROL (mat4/mult m (mat4/scale x y z)  (mat4/create))
           TEST (mat4/scale! m x y z)]
       (are-elements-roughly= TEST CONTROL)))
 
@@ -219,49 +219,49 @@
     (testing "arity-1"
       (let [m (mat4/createFromValues 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15)
             x 99.9
-            CONTROL (mat4/mult (mat4/makeScale x x 1) m  (mat4/create))
+            CONTROL (mat4/mult (mat4/scale x x 1) m  (mat4/create))
             TEST (mat4/pre-scale! m x)]
         (are-elements-roughly= TEST CONTROL)))
     (testing "arity-2"
       (let [m (mat4/createFromValues 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15)
             x 99.9
             y 102.7
-            CONTROL (mat4/mult (mat4/makeScale x y 1) m  (mat4/create))
+            CONTROL (mat4/mult (mat4/scale x y 1) m  (mat4/create))
             TEST (mat4/pre-scale! m x y)]
         (are-elements-roughly= TEST CONTROL)))
     (let [m (mat4/createFromValues 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15)
           [x y z] [10 20 30]
-          CONTROL (mat4/mult (mat4/makeScale x y z) m  (mat4/create))
+          CONTROL (mat4/mult (mat4/scale x y z) m  (mat4/create))
           TEST (mat4/pre-scale! m x y z)]
       (are-elements-roughly= TEST CONTROL)))
 
   (testing "rotateX!"
     (let [m (mat4/createFromValues 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15)
           angle (/ -pi 4)
-          CONTROL (mat4/mult m (mat4/makeRotateX angle) (mat4/create))
+          CONTROL (mat4/mult m (mat4/rotateX angle) (mat4/create))
           TEST (mat4/rotateX! m angle)]
       (are-elements-roughly= TEST CONTROL)))
   (testing "rotateY!"
     (let [m (mat4/createFromValues 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15)
           angle (/ -pi 4)
-          CONTROL (mat4/mult m (mat4/makeRotateY angle) (mat4/create))
+          CONTROL (mat4/mult m (mat4/rotateY angle) (mat4/create))
           TEST (mat4/rotateY! m angle)]
       (are-elements-roughly= TEST CONTROL)))
   (testing "rotateZ!"
     (let [m (mat4/createFromValues 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15)
           angle (/ -pi 4)
-          CONTROL (mat4/mult m (mat4/makeRotateZ angle) (mat4/create))
+          CONTROL (mat4/mult m (mat4/rotateZ angle) (mat4/create))
           TEST (mat4/rotateZ! m angle)]
       (are-elements-roughly= TEST CONTROL)))
   (testing "shear!"
     (let [m (mat4/createFromValues 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15)
           [x y z] [10 20 30]
-          CONTROL (mat4/mult m (mat4/makeShear x y z)  (mat4/create))
+          CONTROL (mat4/mult m (mat4/shear x y z)  (mat4/create))
           TEST (mat4/shear! m x y z)]
       (are-elements-roughly= TEST CONTROL)))
   (testing "pre-shear!"
     (let [m (mat4/createFromValues 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15)
           [x y z] [10 20 30]
-          CONTROL (mat4/mult (mat4/makeShear x y z) m (mat4/create))
+          CONTROL (mat4/mult (mat4/shear x y z) m (mat4/create))
           TEST (mat4/pre-shear! m x y z)]
       (are-elements-roughly= TEST CONTROL))))

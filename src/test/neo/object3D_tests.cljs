@@ -47,7 +47,7 @@
         mat (mat4/mat4)
         control-pos (vec3/vec3 2 3 4)
         control-quat (quat/quaternion (* 0.5 (m/sqrt 2)) 0 0 (* 0.5 (m/sqrt 2)))]
-    (mat4/makeRotateX mat (/ pi 2))
+    (mat4/rotateX mat (/ pi 2))
     (mat4/setPosition mat (vec3/vec3 x y z))
     (o3D/applyMatrix a mat)
     (are-elements-roughly= (.-position a) control-pos)
@@ -174,7 +174,7 @@
 
 (deftest getWorldScale-test
   (let [a (object3D)
-        m (mat4/makeScale (mat4/create) x y z)
+        m (mat4/scale (mat4/create) x y z)
         control (vec3/vec3 x y z)]
     (o3D/applyMatrix a m)
     (are-elements-roughly= (o3D/getWorldScale a) control)))

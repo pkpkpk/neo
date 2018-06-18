@@ -2,15 +2,11 @@
   (:require-macros [neo.macros :refer [vx vy vz vw vsetz vsetz+ vsetx+ aset* goog-typedef]]
                    [neo.vec.compiler :as c])
   (:require [neo.math :as m :include-macros true :refer [sin cos tan]]
+            [neo.util :refer [epsilon]]
             [goog.vec.Mat4 :as gmat]
             [goog.vec.Quaternion :as gq]
             [neo.vec.vec3 :as vec3]
             [neo.vec.quaternion :as quat]))
-
-; extractBasis
-; premultiply
-
-(defn log [& args] (.apply js/console.log js/console (into-array args)))
 
 (goog-define useFloat32 false)
 
@@ -51,10 +47,16 @@
     gmat/createFloat64FromArray))
 
 (defn transpose
+  "Transposes the given matrix mat storing the result into resultMat.
+   @param {Mat4} mat :: The matrix to transpose
+   @param {?Mat4} result :: defaults to first arg.
+   @return {goog.vec.Mat4.AnyType} result"
   ([mat](gmat/transpose mat mat))
   ([mat result](gmat/transpose mat result)))
 
 (defn getTranslation
+  "Retrieves the translation component of the transformation matrix.
+   @return {!goog.vec.Vec3.AnyType}"
   ([m] (vec3/createFromValues (aget m 12) (aget m 13) (aget m 14)))
   ([m v] (vec3/setFromValues v (aget m 12) (aget m 13) (aget m 14))))
 
@@ -80,16 +82,14 @@
     (aset a 14 (aget b 14))
     a))
 
-(defn invert
-  "Computes the inverse of mat storing the result into a. If the
-     inverse is defined, this function returns true, false otherwise.
-   @param {Mat4} mat The matrix to invert.
-   @param {Mat4} resultMat The matrix to receive
-         the result (may be mat).
-   @return {boolean} True if the inverse is defined. If false is returned,
-       resultMat is not modified."
-  ([mat-to-invert] (gmat/invert mat-to-invert mat-to-invert))
-  ([result-mat mat-to-invert] (gmat/invert mat-to-invert result-mat)))
+(defn ^boolean invert
+  "Computes the inverse of mat storing the result into a. If the inverse is
+   defined, this function returns true, false otherwise.
+   @param {Mat4} mat :: The matrix to invert.
+   @param {?Mat4} result :: defaults to first arg.
+   @return {boolean}"
+  ([mat] (gmat/invert mat mat))
+  ([mat result] (gmat/invert mat result)))
 
 (defn determinant
   "Computes the determinant of the matrix.
@@ -99,12 +99,23 @@
   (gmat/determinant mat))
 
 (defn mult
+  "Multiply a and b using matrix multiplication
+   @param {Mat4} a :: The first (left hand) matrix.
+   @param {Mat4} b :: The second (right hand) matrix.
+   @param {?Mat4} result :: defaults to first arg.
+   @return {Mat4} return result"
   ([a b] (gmat/multMat a b a))
   ([a b result] (gmat/multMat a b result)))
 
 (defn multScalar
+  "Multiplies matrix mat with the given scalar
+   @param {Mat4} mat :: The matrix to scale.
+   @param {number} scalar ::  The scalar value to multiply to each element of mat.
+   @param {?Mat4} result :: defaults to first arg
+   @return {Mat4} return result"
   ([mat scalar] (gmat/multScalar mat scalar mat))
   ([mat scalar result] (gmat/multScalar mat scalar result)))
+
 
 (defn translate
   ([x y z]
@@ -112,11 +123,9 @@
   ([mat x y z]
    (gmat/makeTranslate mat x y z)))
 
-(def makeTranslation translate)
-
 (defn translate!
   "shortcut for (mult m (translate x y z))
-   @return {!(Float64Array|Float32Array)} mutated affine transform."
+   @return {!Mat4} mutated affine transform."
   ([m x y](gmat/translate m x y 0))
   ([m x y z] (gmat/translate m x y z)))
 
@@ -128,16 +137,15 @@
   ([m x y z]
    (c/mat4-mult [1 0 0 0,  0 1 0 0,  0 0 1 0,  x y z 1] m)))
 
+
 (defn scale
   ([x y z] (gmat/makeScale (create) x y z))
   ([m x y z] (gmat/makeScale m x y z)))
 
-(def makeScale scale)
-
 (defn scale!
   "Shortcut for (mult m (scale x ?y ?z))
    - A single param will be used for both x + y
-   @return {!(Float64Array|Float32Array)} mutated affine transform."
+   @return {!Mat4} the mutated transform."
   ([m f] (gmat/scale m f f 1))
   ([m x y] (gmat/scale m x y 1))
   ([m x y z] (gmat/scale m x y z)))
@@ -145,7 +153,7 @@
 (defn pre-scale!
   "Shortcut for (mult (scale x ?y ?z) m)
    - A single param will be used for both x + y
-   @return {!(Float64Array|Float32Array)} This affine transform."
+   @return {!Mat4} the mutated transform."
   ([m sx]
    (c/mat4-mult [sx 0 0 0, 0 sx 0 0, 0 0 1 0, 0 0 0 1] m))
   ([m sx sy]
@@ -153,66 +161,58 @@
   ([m sx sy sz]
    (c/mat4-mult [sx 0 0 0, 0 sy 0 0, 0 0 sz 0, 0 0 0 1] m)))
 
+
 (defn rotateX
   ([angle] (gmat/makeRotateX (create) angle))
   ([mat angle] (gmat/makeRotateX mat angle)))
 
-(def makeRotateX rotateX)
-
 (defn rotateX!
   "Rotate the given matrix by angle about the x axis.  Equivalent to:
      (mult m (rotateX theta))
-   @param {!(Float64Array|Float32Array)} m :: the matrix to mutate
+   @param {!Mat4} m :: the matrix to mutate
    @param {!number} theta :: angle in radians
-   @return {!(Float64Array|Float32Array)} the mutated matrix"
+   @return {!Mat4} the mutated transform."
   [m theta]
-  (c/mat4-mult m [1 0 0 0, 0 (cos theta) (sin theta) 0, 0 (- (sin theta)) (cos theta) 0, 0 0 0 1]))
+  (gmat/rotateX m theta))
 
 (defn rotateY
   ([angle] (gmat/makeRotateY (create) angle))
   ([mat angle] (gmat/makeRotateY mat angle)))
 
-(def makeRotateY rotateY)
-
 (defn rotateY!
   "Rotate the given matrix by angle about the y axis.  Equivalent to:
      (mult m (rotateY theta))
-   @param {!(Float64Array|Float32Array)} m :: the matrix to mutate
-   @param {!Number} theta :: angle in radians
-   @return {!(Float64Array|Float32Array)} the mutated matrix"
+   @param {!Mat4} m :: the matrix to mutate
+   @param {!number} theta :: angle in radians
+   @return {!Mat4} the mutated transform."
   [m theta]
-  (c/mat4-mult m [(cos theta) 0 (- (sin theta)) 0,  0 1 0 0,  (sin theta) 0 (cos theta) 0, 0 0 0 1]))
+  (gmat/rotateY m theta))
 
 (defn rotateZ
   ([angle] (gmat/makeRotateZ (create) angle))
   ([mat angle] (gmat/makeRotateZ mat angle)))
 
-(def makeRotateZ rotateZ)
-
 (defn rotateZ!
   "Rotate the given matrix by angle about the z axis. Equivalent to:
      (mult m (rotateZ theta))
-   @param {!(Float64Array|Float32Array)} m :: the matrix to mutate
-   @param {!Number} theta :: angle in radians
-   @return {!(Float64Array|Float32Array)} the mutated matrix"
+   @param {!Mat4} m :: the matrix to mutate
+   @param {!number} theta :: angle in radians
+   @return {!Mat4} the mutated transform."
   [m theta]
-  (c/mat4-mult m [(cos theta) (sin theta) 0 0 (- (sin theta)) (cos theta) 0 0 0 0 1 0 0 0 0 1]))
+  (gmat/rotateZ m theta))
 
-(defn rotateAxis
+(defn rotate-axis
   ([axis angle](gmat/makeRotate create angle (vx axis) (vy axis) (vz axis)))
   ([mat axis angle] (gmat/makeRotate mat angle (vx axis) (vy axis) (vz axis))))
 
-(def makeRotationAxis rotateAxis)
-
 ; (defn rotate-axis! [m theta vec])
+
 
 (defn shear
   "@return {!(Float64Array|Float32Array)} the shear matrix"
-  ([psi theta phi] (makeShear (create) psi theta phi))
+  ([psi theta phi] (shear (create) psi theta phi))
   ([m psi theta phi]
    (setFromValues m 1 (tan theta) 0 0, (tan psi) 1 0, 0 0 (tan phi) 1 0, 0 0 0 1)))
-
-(def makeShear shear)
 
 (defn shear!
   "shortcut for (mult m (shear phi theta psi))
@@ -233,6 +233,7 @@
    (c/mat4-mult [1 (tan theta) 0 0, (tan psi) 1 0 0, 0 0 1 0, 0 0 0 1] m))
   ([m psi theta phi]
    (c/mat4-mult [1 (tan theta) 0 0, (tan psi) 1 0, 0 0 (tan phi) 1 0, 0 0 0 1] m)))
+
 
 (def extractRotation
   (let [v (vec3/vec3)]
@@ -257,7 +258,6 @@
 (defn makeRotationFromEuler
   "@return{mat4}"
   [m euler]
-  ;; make sure euler, not vector
   (let [x euler.x y euler.y z euler.z
         a (m/cos x)
         b (m/sin x)
@@ -289,15 +289,15 @@
     (aset m 15 1)
     m))
 
-(defn makeRotationFromQuaternion
+(defn makeRotationFromQuaternion ;;deprecate
   [m q]
   (gq/toRotationMatrix4 q m))
 
-(defn quat->mat4
+(defn quat->mat4 ;;add optional result-mat arity
   "@param {!quat/Quaternion}
    @return {!Mat4}"
   [q]
-  (makeRotationFromQuaternion (create) (quat/checked-normalize q)))
+  (gq/toRotationMatrix4 (quat/checked-normalize q) (create)))
 
 (defn compose
   "set matrix to composition of position, quaternion, scale"
@@ -343,7 +343,7 @@
   (let [x (vec3/vec3)
         y (vec3/vec3)
         z (vec3/vec3)]
-    (fn [m eye target up]
+    (fn [m eye target up] ;eye components are degrees?
       (vec3/sub eye target z)
       (if (zero? (vec3/lengthSq z))
         (vsetz z 1))
@@ -429,13 +429,6 @@
       (if local-xform
         (mult m local-xform)
         m))))
-
-(def *eps* 1e-10)
-
-(defn ^number epsilon [n]
-  (if (< (m/abs n) *eps*)
-    0
-    n))
 
 (def ^:private shuttle
   #js ["matrix3d("  1  ","   3 ","  5 ","  7 ","
