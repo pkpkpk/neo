@@ -3,13 +3,11 @@
             [neo.vec.mat4 :as mat4]
             [neo.object3D :as o3D :refer [object3D]]))
 
-(defn log [& args] (.apply js/console.log js/console (into-array args)))
-
 (defn camera-updateMatrixWorld
   [camera force]
   (do
     (o3D/updateMatrixWorld camera force)
-    (mat4/invert (.. camera -matrixWorldInverse) (.. camera -matrixWorld))))
+    (mat4/invert (.. camera -matrixWorld) (.. camera -matrixWorldInverse))))
 
 (defn setFocalLength ;focalLength 35 vExtentSlope 0.48403707518022654 fov' 51.657406354011556
   "Sets the FOV by focal length in respect to the current .filmGauge.
@@ -105,7 +103,3 @@
      (.updateProjectionMatrix o)
      o)))
 
-;; missing
-;    setViewOffset: function ( fullWidth, fullHeight, x, y, width, height ),
-;    clearViewOffset()
-;    getWorldDirection()
