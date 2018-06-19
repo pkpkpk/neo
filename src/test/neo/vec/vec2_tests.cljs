@@ -21,14 +21,14 @@
           b (vec2/vec2 (- x) (- y))]
       (vec2/add a b)
       (are-elements-roughly= a [0 0])
-      (let [c (vec2/add (vec2/vec2) b b)]
+      (let [c (vec2/add b b (vec2/vec2))]
         (are-elements-roughly= c [(* x (- 2)) (* y (- 2))]))))
   (testing "sub"
     (let [a (vec2/vec2 x y)
           b (vec2/vec2 (- x) (- y))]
       (vec2/sub a b)
       (are-elements-roughly= a [(* x 2) (* y 2)])
-      (let [c (vec2/sub (vec2/vec2) a a)]
+      (let [c (vec2/sub  a a (vec2/vec2))]
         (are-elements-roughly= c [0 0]))))
   (testing "multiply/divide"
     (let [a (vec2/vec2 x y)

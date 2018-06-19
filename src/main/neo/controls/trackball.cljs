@@ -121,8 +121,8 @@
         (if ^boolean this.staticMoving
           (vec2/copy this.panStart this.panEnd)
           (vec2/add this.panStart
-                (-> mouseChange
-                  (vec2/sub this.panEnd this.panStart)
+                (->
+                  (vec2/sub this.panEnd this.panStart mouseChange)
                   (vec2/multScalar this.dynamicDampingFactor))))))))
 
 (defn checkDistances
