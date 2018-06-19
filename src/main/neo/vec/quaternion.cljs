@@ -4,12 +4,6 @@
   (:require [neo.math :as m :include-macros true]
             [goog.vec.Quaternion :as gq]))
 
-; setFromUnitVectors
-; slerp
-; slerpFlat
-
-(defn log [& args] (.apply js/console.log js/console (into-array args)))
-
 (goog-define useFloat32 false)
 
 (if ^boolean useFloat32
@@ -168,10 +162,49 @@
    @param {!Quaternion} quat :: The resulting quaternion..
    @param {!goog.vec.AnyType} matrix The source matrix.
    @return{!Quaternion}"
-  [q mat]
-  (gq/fromRotationMatrix4 mat q)
-  (.onChangeCallback q)
-  q)
+  [q m]
+  (let [m00 (aget m 0)
+        m10 (aget m 1)
+        m20 (aget m 2)
+        m01 (aget m 4)
+        m11 (aget m 5)
+        m21 (aget m 6)
+        m02 (aget m 8)
+        m12 (aget m 9)
+        m22 (aget m 10)
+        trace (+ m00 m11 m22)]
+    (cond
+      (< 0 trace)
+      (let [s (/ 0.5 (m/sqrt (inc trace)))]
+        (vsetw q (/ 0.25 s))
+        (vsetx q (* s (- m21 m12)))
+        (vsety q (* s (- m02 m20)))
+        (vsetz q (* s (- m10 m01))))
+
+      (and (< m11 m00) (< m22 m00))
+      (let [s (* 2 (m/sqrt (- (inc m00) m11 m22)))]
+        (vsetw q (/ (- m21 m12) s))
+        (vsetx q (* 0.25 s))
+        (vsety q (/ (+ m01 m10) s))
+        (vsetz q (/ (+ m02 m20) s)))
+
+      (< m22 m11)
+      (let [s (* 2 (m/sqrt (- (inc m11) m00 m22)))]
+        (vsetw q (/ (- m02 m20) s))
+        (vsetx q (/ (+ m01 m10) s))
+        (vsety q (* 0.25 s))
+        (vsetz q (/ (+ m12 m21) s)))
+
+      :else
+      (let [s (* 2 (m/sqrt (- (inc m22) m00 m11)))]
+        (vsetw q (/ (- m10 m01) s))
+        (vsetx q (/ (+ m02 m20) s))
+        (vsety q (/ (+ m12 m21) s))
+        (vsetz q (* 0.25 s))))
+
+    (.onChangeCallback q)
+    q))
+
 
 (defn mat4->quat [mat]
   (setFromRotationMatrix (quaternion) mat))
