@@ -8,11 +8,11 @@ Inspired by *THREE.js* and the original *famous* , neo combines primitives for w
 #### The Update Loop Cycle
 + Every Animation Frame:
   1. next-ticks (pre-render)
-    - one-off callbacks registered with `neo.core/next-tick!` are called
-    - the next-tick queue is emptied
+      - one-off callbacks registered with `neo.core/next-tick!` are called
+      - the next-tick queue is emptied
   + every-ticks (pre-render)
-    - callbacks registered with `neo.core/every-tick!` are called
-    - these callbacks are called once every cycle until they are removed with `neo.core/cancel-every-tick!`
+      - callbacks registered with `neo.core/every-tick!` are called
+      - these callbacks are called once every cycle until they are removed with `neo.core/cancel-every-tick!`
   + The Dirty-Check Cycle (rendering)
     - for every registered 'component', each of its associated tweeners is updated. If any tweener returns dirty, `neo.core/*render-fn*` is called on the owner, at most once per cycle.
 
