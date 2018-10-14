@@ -1,6 +1,7 @@
-# ~~`[neo "0.1.0"]`~~
-~~`neo {:mvn/version "0.1.0"}`~~
+# `[neo-cljs "0.1.0"]`
+`neo-cljs {:mvn/version "0.1.0"}`
 
+[![Clojars Project](https://img.shields.io/clojars/v/neo-cljs.svg)](https://clojars.org/neo-cljs)
 
 ## A DOM Animation Library for Clojurescript
 Inspired by *THREE.js* and the original *famous* , neo combines primitives for working with [css matrix3d transforms][1] with a simple api for managing animation state.

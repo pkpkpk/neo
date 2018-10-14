@@ -1,4 +1,4 @@
-(defproject neo "0.1.0"
+(defproject neo-cljs "0.1.0"
   :description "A DOM animation lib for clojurescript"
   :url "https://github.com/pkpkpk/neo"
   :repositories [["clojars" {:sign-releases false}]]
